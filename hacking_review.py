@@ -41,7 +41,7 @@ from mlflow import log_metric,log_param,log_artifacts
 if __name__ == "__main__":
     warnings.filterwarnings("ignore")
     np.random.seed(40)
-    data_path = pd.read_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "Titanic+Data+Set (1).csv")
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Titanic+Data+Set (1).csv")
     data = pd.read_csv(data_path, index_col = 0)
     print('There are {0} rows and {1} columns in given dataset.'.format(data.shape[0], data.shape[1]))
     print('Checking the information about different columns in given dataset')
