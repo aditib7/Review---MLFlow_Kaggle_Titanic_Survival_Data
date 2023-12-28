@@ -428,7 +428,6 @@ if __name__ == "__main__":
         mlflow.sklearn.log_model(perceptron, 'perceptron_model')
         mlflow.sklearn.log_model(linear_svc, 'linear_svc_model')
         mlflow.sklearn.log_model(decision_tree, 'decision_tree')
-        mlflow.log_artifacts("./output")
         
 
 
