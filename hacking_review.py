@@ -31,6 +31,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC, LinearSVC
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 import mlflow
 import mlflow.sklearn
@@ -313,7 +314,7 @@ if __name__ == "__main__":
     data_d = data_d.drop(['Survived'], axis = 1)
 
     # dropping columns, 'Family Members' from dataset
-    data = data.drop(['Family Members', 'With/Without Family'], axis = 1)
+    data = data.drop(['Family Members'], axis = 1)
 
     cleaned_data = pd.get_dummies(data_d, dtype=int)
     cleaned_data['Survived'] = data['Survived']
@@ -322,6 +323,9 @@ if __name__ == "__main__":
     # DIVIDING DATA INTO TARGET AND LABEL 
     X = cleaned_data.drop(["Survived"], axis=1)
     Y = cleaned_data["Survived"]
+
+    metrics = {}
+    params = {}
 
     with mlflow.start_run():
         # splitting the data
@@ -332,55 +336,100 @@ if __name__ == "__main__":
         sgd = linear_model.SGDClassifier(max_iter=5, tol=None)
         sgd.fit(X_train, Y_train)
 
-        sgd_predictions = sgd.predict(X_train)
-        print(f"SGD Classifier Score: {sgd.score(X_train, Y_train)}")
-        acc_sgd = round(sgd.score(X_train, Y_train) * 100, 2)
+        sgd_predictions = sgd.predict(X_test)
+        print(f"SGD Classifier Score: {accuracy_score(Y_test, sgd_predictions)}")
+        acc_sgd = round(accuracy_score(Y_test, sgd_predictions) * 100, 2)
 
         random_forest = RandomForestClassifier(n_estimators=100)
         random_forest.fit(X_train, Y_train)
-        rf_predictions = random_forest.predict(X_train)
-        print(f"Random Forest Classifier Score: {random_forest.score(X_train, Y_train)}")
-        acc_random_forest = round(random_forest.score(X_train, Y_train) * 100, 2)
+        rf_predictions = random_forest.predict(X_test)
+        print(f"Random Forest Classifier Score: {accuracy_score(Y_test, rf_predictions)}")
+        acc_random_forest = round(accuracy_score(Y_test, rf_predictions) * 100, 2)
 
         logreg = LogisticRegression()
         logreg.fit(X_train, Y_train)
-        logreg_predictions = logreg.predict(X_train)
-        print(f"Logistic Regression Score: {logreg.score(X_train, Y_train)}")
-        acc_log = round(logreg.score(X_train, Y_train) * 100, 2)
+        logreg_predictions = logreg.predict(X_test)
+        print(f"Logistic Regression Score: {accuracy_score(Y_test, logreg_predictions)}")
+        acc_log = round(accuracy_score(Y_test, logreg_predictions) * 100, 2)
 
         knn = KNeighborsClassifier(n_neighbors = 3)
         knn.fit(X_train, Y_train)  
-        knn_predictions = knn.predict(X_train) 
-        print(f"K-Nearest Neighbors Classifier Score: {knn.score(X_train, Y_train)}")
-        acc_knn = round(knn.score(X_train, Y_train) * 100, 2)
+        knn_predictions = knn.predict(X_test) 
+        print(f"K-Nearest Neighbors Classifier Score: {accuracy_score(Y_test, knn_predictions)}")
+        acc_knn = round(accuracy_score(Y_test, knn_predictions) * 100, 2)
     
 
         linear_svc = LinearSVC()
         linear_svc.fit(X_train, Y_train)
-        svc_predictions = linear_svc.predict(X_train)
-        print(f"Linear Support Vector Machine Classifier Score: {linear_svc.score(X_train, Y_train)}")
-        acc_linear_svc = round(linear_svc.score(X_train, Y_train) * 100, 2)
+        svc_predictions = linear_svc.predict(X_test)
+        print(f"Linear Support Vector Machine Classifier Score: {accuracy_score(Y_test, svc_predictions)}")
+        acc_linear_svc = round(accuracy_score(Y_test, svc_predictions) * 100, 2)
 
 
         decision_tree = DecisionTreeClassifier()
         decision_tree.fit(X_train, Y_train)  
-        dectree_pred = decision_tree.predict(X_train)  
-acc_decision_tree = round(decision_tree.score(X_train, Y_train) * 100, 2)
+        dectree_predictions = decision_tree.predict(X_test)  
+        print(f"Decision Tree Classifier Score: {accuracy_score(Y_test, dectree_predictions)}")
+        acc_decision_tree = round(accuracy_score(Y_test, dectree_predictions) * 100, 2)
 
+        gaussian = GaussianNB() 
+        gaussian.fit(X_train, Y_train)
+        gaussian_predictions = gaussian.predict(X_test)
+        print(f"Naive Bayes Score: {accuracy_score(Y_test, gaussian_predictions)}")
+        acc_gaussian = round(accuracy_score(Y_test, gaussian_predictions) * 100, 2)
 
+        perceptron = Perceptron(max_iter=5)
+        perceptron.fit(X_train, Y_train)
+        perceptron_predictions = perceptron.predict(X_test)
+        print(f"Perceptron Score: {accuracy_score(Y_test, perceptron_predictions)}")
+        acc_perceptron = round(accuracy_score(Y_test, perceptron_predictions) * 100, 2)
 
-gaussian = GaussianNB() 
-gaussian.fit(X_train, Y_train)
-Y_pred = gaussian.predict(X_train)
-acc_gaussian = round(gaussian.score(X_train, Y_train) * 100, 2)
+        metrics['Support Vector Machines Score'] = acc_linear_svc
+        metrics['KNN Score'] = acc_knn
+        metrics['Logistic Regression Score'] = acc_log
+        metrics['Random Forest Score'] = acc_random_forest
+        metrics['Naive Bayes Score'] = acc_gaussian
+        metrics['Perceptron Score'] = acc_perceptron
+        metrics['Stochastic Gradient Decent Score'] = acc_sgd
+        metrics['Decision Tree Score'] = acc_decision_tree
 
+        params['Support Vector Machines Params'] = linear_svc.get_params()
+        params['KNN Params'] = knn.get_params()
+        params['Logistic Regression Params'] = logreg.get_params()
+        params['Random Forest Params'] = random_forest.get_params()
+        params['Naive Bayes Params'] = gaussian.get_params()
+        params['Perceptron Params'] = perceptron.get_params()
+        params['Stochastic Gradient Decent Params'] = sgd.get_params()
+        params['Decision Tree Params'] = decision_tree.get_params()
+        
+        results = pd.DataFrame({
+            'Model': ['Support Vector Machines', 'KNN', 'Logistic Regression', 
+                      'Random Forest', 'Naive Bayes', 'Perceptron', 
+                      'Stochastic Gradient Decent', 'Decision Tree'],
+            'Score': [acc_linear_svc, acc_knn, acc_log, 
+                      acc_random_forest, acc_gaussian, acc_perceptron, 
+                      acc_sgd, acc_decision_tree]})
+            
+        result_df = results.sort_values(by='Score', ascending=False)
+        result_df.head(9)
 
-perceptron = Perceptron(max_iter=5)
-perceptron.fit(X_train, Y_train)
+        mlflow.log_param("max_iter", max_iter)
+        mlflow.log_param("tol", tol)
+        mlflow.log_param("n_estimators", n_estimators)
+        mlflow.log_param("n_neighbors", n_neighbors)
+        mlflow.log_params(params)
+        mlflow.log_metrics(metrics)
+        mlflow.sklearn.log_model(sgd, 'sgd_model')
+        mlflow.sklearn.log_model(knn, 'knn_model')
+        mlflow.sklearn.log_model(logreg, 'logreg_model')
+        mlflow.sklearn.log_model(random_forest, 'random_forest_model')
+        mlflow.sklearn.log_model(gaussian, 'gaussian_model')
+        mlflow.sklearn.log_model(perceptron, 'perceptron_model')
+        mlflow.sklearn.log_model(linear_svc, 'linear_svc_model')
+        mlflow.sklearn.log_model(decision_tree, 'decision_tree')
+     
+        
 
-Y_pred = perceptron.predict(X_train)
-
-acc_perceptron = round(perceptron.score(X_train, Y_train) * 100, 2)
 
     
 
