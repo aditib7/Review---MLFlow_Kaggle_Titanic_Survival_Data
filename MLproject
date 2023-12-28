@@ -1,0 +1,7 @@
+name: mlflow_review_demos
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    command: "python hacking_review.py"
