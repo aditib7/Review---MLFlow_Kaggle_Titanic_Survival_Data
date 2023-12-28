@@ -328,6 +328,7 @@ if __name__ == "__main__":
     params = {}
 
     with mlflow.start_run():
+        
         # splitting the data
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=.25, random_state=1)
         mlflow.log_params({"Train_shape": X_train.shape, "Test_shape": X_test.shape})
@@ -427,7 +428,7 @@ if __name__ == "__main__":
         mlflow.sklearn.log_model(perceptron, 'perceptron_model')
         mlflow.sklearn.log_model(linear_svc, 'linear_svc_model')
         mlflow.sklearn.log_model(decision_tree, 'decision_tree')
-     
+        mlflow.log_artifacts("./output")
         
 
 
