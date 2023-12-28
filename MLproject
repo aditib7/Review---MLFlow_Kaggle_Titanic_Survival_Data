@@ -1,4 +1,4 @@
-name: mlflow_review_demos
+name: tutorial
 
 conda_env: conda.yaml
 
