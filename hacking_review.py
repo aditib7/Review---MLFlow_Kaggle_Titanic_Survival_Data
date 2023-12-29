@@ -324,6 +324,9 @@ if __name__ == "__main__":
     X = cleaned_data.drop(["Survived"], axis=1)
     Y = cleaned_data["Survived"]
 
+    # changing the data type of lable, 'Survived' to categorical data type
+    Y = Y.astype('category')
+
     metrics = {}
     params = {}
 
@@ -355,7 +358,7 @@ if __name__ == "__main__":
 
         knn = KNeighborsClassifier(n_neighbors = 3)
         knn.fit(X_train, Y_train)  
-        knn_predictions = knn.predict(X_test) 
+        knn_predictions = knn.predict(X_test.values) 
         print(f"K-Nearest Neighbors Classifier Score: {accuracy_score(Y_test, knn_predictions)}")
         acc_knn = round(accuracy_score(Y_test, knn_predictions) * 100, 2)
     
@@ -414,10 +417,6 @@ if __name__ == "__main__":
         result_df = results.sort_values(by='Score', ascending=False)
         result_df.head(9)
 
-        mlflow.log_param("max_iter", max_iter)
-        mlflow.log_param("tol", tol)
-        mlflow.log_param("n_estimators", n_estimators)
-        mlflow.log_param("n_neighbors", n_neighbors)
         mlflow.log_params(params)
         mlflow.log_metrics(metrics)
         mlflow.sklearn.log_model(sgd, 'sgd_model')
